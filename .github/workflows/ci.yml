@@ -33,6 +33,7 @@ jobs:
           cat > build-output/admin/vercel.json << 'EOL'
           {
             "version": 2,
+            "framework": "vite",
             "public": true,
             "rewrites": [
               {
@@ -40,6 +41,21 @@ jobs:
                 "destination": "/index.html"
               }
             ]
+          }
+          EOL
+      - name: Create package.json for Vercel
+        run: |
+          cat > build-output/admin/package.json << 'EOL'
+          {
+            "name": "sillok-admin",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "serve": "^14.0.0"
+            },
+            "scripts": {
+              "start": "serve -s ."
+            }
           }
           EOL
       - name: Deploy to Vercel
@@ -51,7 +67,7 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
           working-directory: ./build-output/admin
           vercel-args: '--prod'
-          
+
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -81,6 +97,7 @@ jobs:
           cat > build-output/user/vercel.json << 'EOL'
           {
             "version": 2,
+            "framework": "vite",
             "public": true,
             "rewrites": [
               {
@@ -88,6 +105,21 @@ jobs:
                 "destination": "/index.html"
               }
             ]
+          }
+          EOL
+      - name: Create package.json for Vercel
+        run: |
+          cat > build-output/user/package.json << 'EOL'
+          {
+            "name": "sillok-user",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "serve": "^14.0.0"
+            },
+            "scripts": {
+              "start": "serve -s ."
+            }
           }
           EOL
       - name: Deploy to Vercel
