@@ -4,12 +4,9 @@ on:
     branches:
       - develop
 jobs:
-  Deploy-Admin-Production:
+  Build-Projects:
     runs-on: ubuntu-latest
     environment: PROD
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,91 +20,63 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build Admin Project
         run: yarn nx build sillok-admin --prod
-      - name: Create Vercel JSON Config
-        run: |
-          cat > apps/sillok-admin/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "buildCommand": "cd ../.. && yarn nx build sillok-admin",
-            "outputDirectory": "dist",
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Install Vercel CLI
-        run: npm install --global vercel
-      - name: Setup Vercel Project
-        run: |
-          mkdir -p ~/.vercel
-          echo '{"projectId":"${{ secrets.VERCEL_ADMIN_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > ~/.vercel/project.json
-      - name: Prepare dist directory
-        run: |
-          mkdir -p apps/sillok-admin/dist
-          # 빌드 결과물 위치 확인
-          find dist -type d -name "sillok-admin" | xargs -I{} ls -la {} || echo "No sillok-admin directory in dist"
-          # 복사 시도
-          cp -rv dist/apps/sillok-admin/* apps/sillok-admin/dist/ 2>/dev/null || cp -rv apps/sillok-admin/dist/* apps/sillok-admin/dist/ 2>/dev/null || echo "No dist files found to copy"
-      - name: Deploy Admin Project to Vercel
-        run: |
-          cd apps/sillok-admin
-          echo "Deploying Admin Project to Vercel..."
-          vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes
-  
-  Deploy-User-Production:
-    runs-on: ubuntu-latest
-    environment: PROD
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_USER_PROJECT_ID }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'yarn'
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
       - name: Build User Project
         run: yarn nx build sillok-user --prod
-      - name: Create Vercel JSON Config
+      - name: Copy Admin Build Output
         run: |
-          cat > apps/sillok-user/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "buildCommand": "cd ../.. && yarn nx build sillok-user",
-            "outputDirectory": "dist",
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Install Vercel CLI
-        run: npm install --global vercel
-      - name: Setup Vercel Project
-        run: |
-          mkdir -p ~/.vercel
-          echo '{"projectId":"${{ secrets.VERCEL_USER_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > ~/.vercel/project.json
-      - name: Prepare dist directory
+          mkdir -p apps/sillok-admin/dist
+          cp -r dist/apps/sillok-admin/* apps/sillok-admin/dist/ || echo "No admin build output found"
+      - name: Copy User Build Output
         run: |
           mkdir -p apps/sillok-user/dist
-          # 빌드 결과물 위치 확인
-          find dist -type d -name "sillok-user" | xargs -I{} ls -la {} || echo "No sillok-user directory in dist"
-          # 복사 시도
-          cp -rv dist/apps/sillok-user/* apps/sillok-user/dist/ 2>/dev/null || cp -rv apps/sillok-user/dist/* apps/sillok-user/dist/ 2>/dev/null || echo "No dist files found to copy"
-      - name: Deploy User Project to Vercel
-        run: |
-          cd apps/sillok-user
-          echo "Deploying User Project to Vercel..."
-          vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes
+          cp -r dist/apps/sillok-user/* apps/sillok-user/dist/ || echo "No user build output found"
+      - name: Upload Admin Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: admin-build
+          path: apps/sillok-admin
+      - name: Upload User Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: user-build
+          path: apps/sillok-user
+
+  Deploy-Admin:
+    needs: Build-Projects
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Download Admin Build
+        uses: actions/download-artifact@v3
+        with:
+          name: admin-build
+          path: admin
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+          working-directory: admin
+          vercel-args: '--prod'
+
+  Deploy-User:
+    needs: Build-Projects
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Download User Build
+        uses: actions/download-artifact@v3
+        with:
+          name: user-build
+          path: user
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_USER_PROJECT_ID }}
+          working-directory: user
+          vercel-args: '--prod'
