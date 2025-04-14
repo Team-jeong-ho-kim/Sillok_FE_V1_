@@ -6,10 +6,6 @@ on:
 jobs:
   Deploy-Admin-Production:
     runs-on: ubuntu-latest
-    environment: PROD
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,38 +19,18 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build Admin Project
         run: yarn nx build sillok-admin
-      - name: Create Vercel JSON Config
-        run: |
-          cat > apps/sillok-admin/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "buildCommand": "cd ../.. && yarn nx build sillok-admin",
-            "outputDirectory": "../../dist/apps/sillok-admin",
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Install Vercel CLI
-        run: npm install --global vercel
-      - name: Copy dist to apps/sillok-admin
-        run: |
-          # 이미 dist 폴더에 빌드 결과물이 있으므로 복사할 필요 없음
-          echo "Build output already in apps/sillok-admin/dist"
-      - name: Deploy Admin Project to Vercel
-        run: |
-          cd apps/sillok-admin
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+      - name: Deploy to Vercel
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+          PRODUCTION: true
+          WORKING_DIRECTORY: apps/sillok-admin
+      
   Deploy-User-Production:
     runs-on: ubuntu-latest
-    environment: PROD
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_USER_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -68,29 +44,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build User Project
         run: yarn nx build sillok-user
-      - name: Create Vercel JSON Config
-        run: |
-          cat > apps/sillok-user/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "buildCommand": "cd ../.. && yarn nx build sillok-user",
-            "outputDirectory": "../../dist/apps/sillok-user",
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Install Vercel CLI
-        run: npm install --global vercel
-      - name: Copy dist to apps/sillok-user
-        run: |
-          # 이미 dist 폴더에 빌드 결과물이 있으므로 복사할 필요 없음
-          echo "Build output already in apps/sillok-user/dist"
-      - name: Deploy User Project to Vercel
-        run: |
-          cd apps/sillok-user
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+      - name: Deploy to Vercel
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_USER_PROJECT_ID }}
+          PRODUCTION: true
+          WORKING_DIRECTORY: apps/sillok-user
