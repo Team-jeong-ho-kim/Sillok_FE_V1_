@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom"]
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/sillok-admin"
+    },
+    {
+      "path": "./apps/sillok-user"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/design-token"
+    },
+    {
+      "path": "./libs/hooks"
+    }
+  ],
+  "@entry/design-token/*": ["libs/design-token/src/*"],
+  "@entry/hooks/*": ["libs/hooks/src/index.ts"],
+  "@entry/ui/*": ["libs/ui/src/idnex.ts"]
+}
