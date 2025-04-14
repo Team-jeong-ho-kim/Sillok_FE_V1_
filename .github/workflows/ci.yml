@@ -20,44 +20,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build Admin Project
         run: yarn nx build sillok-admin
-      - name: Prepare files for deployment
+      - name: Create Deploy Directory
         run: |
-          # 빌드 결과물 확인
-          ls -la apps/sillok-admin/dist || echo "No dist directory found"
-          # 결과물 복사를 위한 임시 폴더 생성
-          mkdir -p build-output/admin
-          # 모든 빌드 결과물 복사
-          cp -rv apps/sillok-admin/dist/* build-output/admin/ || echo "No files to copy"
-      - name: Create vercel.json
-        run: |
-          cat > build-output/admin/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "public": true,
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Create package.json for Vercel
-        run: |
-          cat > build-output/admin/package.json << 'EOL'
-          {
-            "name": "sillok-admin",
-            "version": "1.0.0",
-            "private": true,
-            "dependencies": {
-              "serve": "^14.0.0"
-            },
-            "scripts": {
-              "start": "serve -s ."
-            }
-          }
-          EOL
+          mkdir -p static-admin
+          cp -rv apps/sillok-admin/dist/* static-admin/
+          echo '{"version":2,"public":true,"cleanUrls":true,"rewrites":[{"source":"/(.*)", "destination":"/index.html"}]}' > static-admin/vercel.json
+          echo '{"name":"sillok-admin","devCommand":"npx serve .","outputDirectory":"."}' > static-admin/package.json
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -65,9 +33,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
-          working-directory: ./build-output/admin
-          vercel-args: '--prod'
-
+          working-directory: ./static-admin
+          vercel-args: '--prod --confirm'
+          
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -84,44 +52,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build User Project
         run: yarn nx build sillok-user
-      - name: Prepare files for deployment
+      - name: Create Deploy Directory
         run: |
-          # 빌드 결과물 확인
-          ls -la apps/sillok-user/dist || echo "No dist directory found"
-          # 결과물 복사를 위한 임시 폴더 생성
-          mkdir -p build-output/user
-          # 모든 빌드 결과물 복사
-          cp -rv apps/sillok-user/dist/* build-output/user/ || echo "No files to copy"
-      - name: Create vercel.json
-        run: |
-          cat > build-output/user/vercel.json << 'EOL'
-          {
-            "version": 2,
-            "framework": "vite",
-            "public": true,
-            "rewrites": [
-              {
-                "source": "/(.*)",
-                "destination": "/index.html"
-              }
-            ]
-          }
-          EOL
-      - name: Create package.json for Vercel
-        run: |
-          cat > build-output/user/package.json << 'EOL'
-          {
-            "name": "sillok-user",
-            "version": "1.0.0",
-            "private": true,
-            "dependencies": {
-              "serve": "^14.0.0"
-            },
-            "scripts": {
-              "start": "serve -s ."
-            }
-          }
-          EOL
+          mkdir -p static-user
+          cp -rv apps/sillok-user/dist/* static-user/
+          echo '{"version":2,"public":true,"cleanUrls":true,"rewrites":[{"source":"/(.*)", "destination":"/index.html"}]}' > static-user/vercel.json
+          echo '{"name":"sillok-user","devCommand":"npx serve .","outputDirectory":"."}' > static-user/package.json
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -129,5 +65,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_USER_PROJECT_ID }}
-          working-directory: ./build-output/user
-          vercel-args: '--prod'
+          working-directory: ./static-user
+          vercel-args: '--prod --confirm'
