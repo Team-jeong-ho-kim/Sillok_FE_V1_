@@ -6,6 +6,7 @@ on:
 jobs:
   Deploy-Admin-Production:
     runs-on: ubuntu-latest
+    environment: PROD
     steps:
       - uses: actions/checkout@v3
         with:
@@ -20,17 +21,17 @@ jobs:
       - name: Build Admin Project
         run: yarn nx build sillok-admin
       - name: Deploy to Vercel
-        uses: BetaHuhn/deploy-to-vercel-action@v1
+        uses: amondnet/vercel-action@v20
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
-          PRODUCTION: true
-          WORKING_DIRECTORY: apps/sillok-admin
-      
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+          working-directory: ./apps/sillok-admin
+          
   Deploy-User-Production:
     runs-on: ubuntu-latest
+    environment: PROD
     steps:
       - uses: actions/checkout@v3
         with:
@@ -45,11 +46,10 @@ jobs:
       - name: Build User Project
         run: yarn nx build sillok-user
       - name: Deploy to Vercel
-        uses: BetaHuhn/deploy-to-vercel-action@v1
+        uses: amondnet/vercel-action@v20
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_USER_PROJECT_ID }}
-          PRODUCTION: true
-          WORKING_DIRECTORY: apps/sillok-user
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_USER_PROJECT_ID }}
+          working-directory: ./apps/sillok-user
