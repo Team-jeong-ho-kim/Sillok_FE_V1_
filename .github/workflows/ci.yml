@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+
 jobs:
   Deploy-Admin-Production:
     runs-on: ubuntu-latest
@@ -23,14 +24,14 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build Admin Project
         run: yarn nx build sillok-admin
-      - name: Create Vercel JSON Config
+      - name: Create Vercel JSON Config (Admin)
         run: |
           cat > apps/sillok-admin/vercel.json << 'EOL'
           {
             "version": 2,
             "framework": "vite",
             "buildCommand": "cd ../.. && yarn nx build sillok-admin",
-            "outputDirectory": "../../dist/apps/sillok-admin",
+            "outputDirectory": "apps/sillok-admin/dist",
             "rewrites": [
               {
                 "source": "/(.*)",
@@ -41,14 +42,10 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
-      - name: Copy dist to apps/sillok-admin
-        run: |
-          mkdir -p apps/sillok-admin/dist
-          cp -r dist/apps/sillok-admin/* apps/sillok-admin/dist/
       - name: Deploy Admin Project to Vercel
         run: |
-          cd apps/sillok-admin
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/sillok-admin
+
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -68,14 +65,14 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build User Project
         run: yarn nx build sillok-user
-      - name: Create Vercel JSON Config
+      - name: Create Vercel JSON Config (User)
         run: |
           cat > apps/sillok-user/vercel.json << 'EOL'
           {
             "version": 2,
             "framework": "vite",
             "buildCommand": "cd ../.. && yarn nx build sillok-user",
-            "outputDirectory": "../../dist/apps/sillok-user",
+            "outputDirectory": "dist/apps/sillok-user",
             "rewrites": [
               {
                 "source": "/(.*)",
@@ -86,11 +83,6 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
-      - name: Copy dist to apps/sillok-user
-        run: |
-          mkdir -p apps/sillok-user/dist
-          cp -r dist/apps/sillok-user/* apps/sillok-user/dist/
       - name: Deploy User Project to Vercel
         run: |
-          cd apps/sillok-user
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/sillok-user
