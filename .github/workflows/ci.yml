@@ -35,7 +35,7 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
           working-directory: ./static-admin
           vercel-args: '--prod --confirm'
-          
+
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
