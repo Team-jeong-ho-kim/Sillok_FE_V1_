@@ -48,7 +48,7 @@ jobs:
       - name: Deploy Admin Project to Vercel
         run: |
           cd apps/sillok-admin
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -93,4 +93,4 @@ jobs:
       - name: Deploy User Project to Vercel
         run: |
           cd apps/sillok-user
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
