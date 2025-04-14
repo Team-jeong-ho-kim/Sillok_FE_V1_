@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
       - name: Build Admin Project
-        run: yarn nx build sillok-admin
+        run: yarn nx build sillok-admin --prod
       - name: Create Vercel JSON Config
         run: |
           cat > apps/sillok-admin/vercel.json << 'EOL'
@@ -30,7 +30,7 @@ jobs:
             "version": 2,
             "framework": "vite",
             "buildCommand": "cd ../.. && yarn nx build sillok-admin",
-            "outputDirectory": "../../apps/sillok-admin/dist",
+            "outputDirectory": "dist",
             "rewrites": [
               {
                 "source": "/(.*)",
@@ -41,14 +41,18 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
-      - name: Copy dist to apps/sillok-admin
+      - name: Prepare dist directory
         run: |
           mkdir -p apps/sillok-admin/dist
-          cp -r apps/sillok-admin/dist/* apps/sillok-admin/dist/
+          # 빌드 결과물 위치 확인
+          find dist -type d -name "sillok-admin" | xargs -I{} ls -la {}
+          # 복사 시도
+          cp -rv dist/apps/sillok-admin/* apps/sillok-admin/dist/ 2>/dev/null || cp -rv apps/sillok-admin/dist/* apps/sillok-admin/dist/ 2>/dev/null || echo "No dist files found to copy"
       - name: Deploy Admin Project to Vercel
         run: |
           cd apps/sillok-admin
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          echo "Deploying Admin Project to Vercel..."
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -67,7 +71,7 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
       - name: Build User Project
-        run: yarn nx build sillok-user
+        run: yarn nx build sillok-user --prod
       - name: Create Vercel JSON Config
         run: |
           cat > apps/sillok-user/vercel.json << 'EOL'
@@ -75,7 +79,7 @@ jobs:
             "version": 2,
             "framework": "vite",
             "buildCommand": "cd ../.. && yarn nx build sillok-user",
-            "outputDirectory": "../../dist/apps/sillok-user",
+            "outputDirectory": "dist",
             "rewrites": [
               {
                 "source": "/(.*)",
@@ -86,11 +90,15 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
-      - name: Copy dist to apps/sillok-user
+      - name: Prepare dist directory
         run: |
           mkdir -p apps/sillok-user/dist
-          cp -r dist/apps/sillok-user/* apps/sillok-user/dist/
+          # 빌드 결과물 위치 확인
+          find dist -type d -name "sillok-user" | xargs -I{} ls -la {}
+          # 복사 시도
+          cp -rv dist/apps/sillok-user/* apps/sillok-user/dist/ 2>/dev/null || cp -rv apps/sillok-user/dist/* apps/sillok-user/dist/ 2>/dev/null || echo "No dist files found to copy"
       - name: Deploy User Project to Vercel
         run: |
           cd apps/sillok-user
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+          echo "Deploying User Project to Vercel..."
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
