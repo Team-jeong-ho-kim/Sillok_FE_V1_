@@ -1,31 +1,29 @@
-name: GitHub Actions Vercel Production Deployment
+name: 정적 파일 Vercel 배포
+
 on:
   push:
     branches:
       - develop
+
 jobs:
-  Deploy-Admin-Production:
+  deploy-admin:
     runs-on: ubuntu-latest
-    environment: PROD
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
-      - name: Install Dependencies
+
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
+
       - name: Build Admin Project
         run: yarn nx build sillok-admin
-      - name: Create Deploy Directory
-        run: |
-          mkdir -p static-admin
-          cp -rv apps/sillok-admin/dist/* static-admin/
-          echo '{"version":2,"public":true,"cleanUrls":true,"rewrites":[{"source":"/(.*)", "destination":"/index.html"}]}' > static-admin/vercel.json
-          echo '{"name":"sillok-admin","devCommand":"npx serve .","outputDirectory":"."}' > static-admin/package.json
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -33,31 +31,27 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
-          working-directory: ./static-admin
+          working-directory: ./apps/sillok-admin/dist
           vercel-args: '--prod --confirm'
 
-  Deploy-User-Production:
+  deploy-user:
     runs-on: ubuntu-latest
-    environment: PROD
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
-      - name: Install Dependencies
+
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
+
       - name: Build User Project
         run: yarn nx build sillok-user
-      - name: Create Deploy Directory
-        run: |
-          mkdir -p static-user
-          cp -rv apps/sillok-user/dist/* static-user/
-          echo '{"version":2,"public":true,"cleanUrls":true,"rewrites":[{"source":"/(.*)", "destination":"/index.html"}]}' > static-user/vercel.json
-          echo '{"name":"sillok-user","devCommand":"npx serve .","outputDirectory":"."}' > static-user/package.json
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -65,5 +59,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_USER_PROJECT_ID }}
-          working-directory: ./static-user
+          working-directory: ./apps/sillok-user/dist
           vercel-args: '--prod --confirm'
