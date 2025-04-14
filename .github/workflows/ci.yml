@@ -41,18 +41,23 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
+      - name: Setup Vercel Project
+        run: |
+          mkdir -p ~/.vercel
+          echo '{"projectId":"${{ secrets.VERCEL_ADMIN_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > ~/.vercel/project.json
       - name: Prepare dist directory
         run: |
           mkdir -p apps/sillok-admin/dist
           # 빌드 결과물 위치 확인
-          find dist -type d -name "sillok-admin" | xargs -I{} ls -la {}
+          find dist -type d -name "sillok-admin" | xargs -I{} ls -la {} || echo "No sillok-admin directory in dist"
           # 복사 시도
           cp -rv dist/apps/sillok-admin/* apps/sillok-admin/dist/ 2>/dev/null || cp -rv apps/sillok-admin/dist/* apps/sillok-admin/dist/ 2>/dev/null || echo "No dist files found to copy"
       - name: Deploy Admin Project to Vercel
         run: |
           cd apps/sillok-admin
           echo "Deploying Admin Project to Vercel..."
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+          vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes
+  
   Deploy-User-Production:
     runs-on: ubuntu-latest
     environment: PROD
@@ -90,15 +95,19 @@ jobs:
           EOL
       - name: Install Vercel CLI
         run: npm install --global vercel
+      - name: Setup Vercel Project
+        run: |
+          mkdir -p ~/.vercel
+          echo '{"projectId":"${{ secrets.VERCEL_USER_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > ~/.vercel/project.json
       - name: Prepare dist directory
         run: |
           mkdir -p apps/sillok-user/dist
           # 빌드 결과물 위치 확인
-          find dist -type d -name "sillok-user" | xargs -I{} ls -la {}
+          find dist -type d -name "sillok-user" | xargs -I{} ls -la {} || echo "No sillok-user directory in dist"
           # 복사 시도
           cp -rv dist/apps/sillok-user/* apps/sillok-user/dist/ 2>/dev/null || cp -rv apps/sillok-user/dist/* apps/sillok-user/dist/ 2>/dev/null || echo "No dist files found to copy"
       - name: Deploy User Project to Vercel
         run: |
           cd apps/sillok-user
           echo "Deploying User Project to Vercel..."
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+          vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes
