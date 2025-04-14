@@ -31,12 +31,12 @@ jobs:
           mkdir -p apps/sillok-user/dist
           cp -r dist/apps/sillok-user/* apps/sillok-user/dist/ || echo "No user build output found"
       - name: Upload Admin Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: admin-build
           path: apps/sillok-admin
       - name: Upload User Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: user-build
           path: apps/sillok-user
@@ -47,12 +47,12 @@ jobs:
     environment: PROD
     steps:
       - name: Download Admin Build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: admin-build
           path: admin
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,12 +67,12 @@ jobs:
     environment: PROD
     steps:
       - name: Download User Build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: user-build
           path: user
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
