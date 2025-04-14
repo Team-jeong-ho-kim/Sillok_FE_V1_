@@ -9,8 +9,14 @@ const root = ReactDOM.createRoot(
 
 const queryClient = new QueryClient();
 
+const cookiesOptions = {
+  path: '/',
+  sameSite: 'strict' as const,
+  secure: window.location.protocol === 'https:',
+};
+
 root.render(
-  <CookiesProvider>
+  <CookiesProvider defaultSetOptions={cookiesOptions}>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
