@@ -23,6 +23,8 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build Admin Project
+        env:
+          VITE_BASE_URL: ${{ secrets.SERVER_URL}}
         run: yarn nx build sillok-admin
 
       - name: AWS S3 Upload
@@ -60,6 +62,8 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build User Project
+        env:
+          VITE_BASE_URL: https://sillok-api.xquare.app
         run: yarn nx build sillok-user
 
       - name: AWS S3 Upload
