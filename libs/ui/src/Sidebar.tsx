@@ -41,7 +41,7 @@ export const Sidebar = ({ setSelect, select }: ISidebarType) => {
       keyword: 'AI',
     },
     {
-      name: 'embedded',
+      name: 'Embedded',
       keyword: 'EMBEDDED',
     },
     {
