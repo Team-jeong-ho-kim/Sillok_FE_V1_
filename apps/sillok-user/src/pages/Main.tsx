@@ -33,13 +33,18 @@ export const Main = () => {
     <Flex isColumn={true}>
       <BannerImg src={banner} alt="banner img" />
       <TextContainer>
-        <Text fontSize={36} fontWeight={700} color="#BF843D" isSpan={true}>
+        <Text fontSize={'2.4vw'} fontWeight={700} color="#BF843D" isSpan={true}>
           대덕 SW 마이스터고
-          <Text fontSize={36} fontWeight={700} color="#FFFFFF" isSpan={true}>
+          <Text
+            fontSize={'2.4vw'}
+            fontWeight={700}
+            color="#FFFFFF"
+            isSpan={true}
+          >
             에<br /> 입학 하신 것을 축하드려요!
           </Text>
         </Text>
-        <Text fontSize={20} fontWeight={400} color="#D3D3D3" isSpan={true}>
+        <Text fontSize={'1.3vw'} fontWeight={400} color="#D3D3D3" isSpan={true}>
           전공 공부를 시작하는 신입생
           <br /> 여러분을 위한 가이드를 준비했습니다.
         </Text>
@@ -89,6 +94,9 @@ const TextContainer = styled.div`
     left: 80px;
     gap: 20px;
   }
+  @media (max-width: 858px) {
+    display: none;
+  }
 `;
 
 const BannerImg = styled.img`
@@ -96,20 +104,23 @@ const BannerImg = styled.img`
   position: relative;
   top: 0;
   z-index: -1;
+  @media (max-width: 858px) {
+    display: none;
+  }
 `;
 
 const Button = styled.button`
   cursor: pointer;
-  width: 230px;
-  height: 64px;
+  width: 14vw;
+  height: 6.7vh;
   display: flex;
   justify-content: center;
   align-items: center;
   color: #ffffff;
-  font-size: 20px;
+  font-size: 1.4vw;
   font-weight: 600;
   background-color: #402e18;
-  border-radius: 32px;
+  border-radius: 100px;
   &:hover {
     transition: 0.35s ease-in-out;
     background-color: #302212;

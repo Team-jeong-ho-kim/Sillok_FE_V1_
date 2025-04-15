@@ -6,6 +6,7 @@ import { useApiSuggestion } from '../apis';
 export const Suggestion = () => {
   const [select, setSelect] = useState<string>('');
   const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [isWidth, setIsWidth] = useState<boolean>(window.innerWidth > 990);
 
   const [datas, setDatas] = useState<{
     title: string;
@@ -20,6 +21,15 @@ export const Suggestion = () => {
     category: select,
     image: null,
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsWidth(window.innerWidth > 990);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -87,22 +97,28 @@ export const Suggestion = () => {
       setIsBlocked(false);
     }
   }, [datas]);
-  console.log(datas);
 
   return (
     <Flex
       justifyContent="center"
       alignItems="center"
-      height="calc(100vh - 70px)"
+      paddingTop="100px"
+      paddingBottom="50px"
     >
-      <Flex isColumn={true} gap={52} paddingLeft="100px" paddingRight="100px">
-        <Flex gap={120}>
+      <Flex
+        isColumn={true}
+        gap={52}
+        paddingLeft={isWidth ? '100px' : '50px'}
+        paddingRight={isWidth ? '100px' : '50px'}
+        width="100%"
+      >
+        <Flex gap={isWidth ? 120 : 40} isColumn={!isWidth}>
           <ImgSelector
             imgUrl={imgUrl}
             setImgUrl={setImgUrl}
             onFileChange={handleFileChange}
           />
-          <Flex isColumn={true} gap={60}>
+          <Flex isColumn={true} gap={60} width={isWidth ? 'auto' : '100%'}>
             <Inputs
               maxLength={50}
               label="글 제목"
