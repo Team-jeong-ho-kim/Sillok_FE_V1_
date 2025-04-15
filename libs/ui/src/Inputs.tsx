@@ -9,6 +9,7 @@ interface IInputType {
   isPwd?: boolean;
   width?: string;
   value?: string;
+  maxLength?: number;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -19,6 +20,7 @@ export const Inputs = ({
   placeholder,
   isPwd,
   onChange,
+  maxLength,
 }: IInputType) => {
   const [isEye, setIsEye] = useState<boolean>(false);
 
@@ -30,6 +32,7 @@ export const Inputs = ({
       <Text>{label}</Text>
       <Flex position="relative">
         <Input
+          maxLength={maxLength}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
