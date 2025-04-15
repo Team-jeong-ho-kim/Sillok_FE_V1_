@@ -16,6 +16,15 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["development"]
+    "customConditions": ["development"],
+    "baseUrl": ".",
+    "paths": {
+      "@sillok/design-token": ["libs/design-token/src/index.ts"],
+      "@sillok/design-token/*": ["libs/design-token/src/*"],
+      "@sillok/hooks": ["libs/hooks/src/index.ts"],
+      "@sillok/hooks/*": ["libs/hooks/src/*"],
+      "@sillok/ui": ["libs/ui/src/index.ts"],
+      "@sillok/ui/*": ["libs/ui/src/*"]
+    }
   }
 }

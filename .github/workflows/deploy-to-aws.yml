@@ -1,0 +1,85 @@
+name: NANU_CLIENT_SMART_DEPLOY
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-admin:
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Admin Project
+        env:
+          VITE_BASE_URL: ${{ secrets.SERVER_URL}}
+        run: yarn nx build sillok-admin
+
+      - name: AWS S3 Upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          ADMIN_S3_BUCKET_NAME: ${{ secrets.ADMIN_S3_BUCKET_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 sync apps/sillok-admin/dist/ s3://$ADMIN_S3_BUCKET_NAME --acl private --delete --region $AWS_REGION
+
+      - name: CloudFront Invalidation
+        uses: chetan/invalidate-cloudfront-action@master
+        env:
+          PATHS: '/*'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          DISTRIBUTION: ${{ secrets.ADMIN_CLOUDFRONT_DISTRIBUTION_ID }}
+
+  deploy-user:
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build User Project
+        env:
+          VITE_BASE_URL: https://sillok-api.xquare.app
+        run: yarn nx build sillok-user
+
+      - name: AWS S3 Upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          USER_S3_BUCKET_NAME: ${{ secrets.USER_S3_BUCKET_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 sync apps/sillok-user/dist/ s3://$USER_S3_BUCKET_NAME --acl private --delete --region $AWS_REGION
+
+      - name: CloudFront Invalidation
+        uses: chetan/invalidate-cloudfront-action@master
+        env:
+          PATHS: '/*'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          DISTRIBUTION: ${{ secrets.USER_CLOUDFRONT_DISTRIBUTION_ID }}

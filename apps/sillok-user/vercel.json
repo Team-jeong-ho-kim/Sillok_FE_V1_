@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "framework": "vite",
-  "buildCommand": "cd ../.. && yarn nx build sillok-user",
-  "outputDirectory": "../../dist/apps/sillok-user",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",

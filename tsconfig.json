@@ -22,8 +22,5 @@
     {
       "path": "./libs/hooks"
     }
-  ],
-  "@entry/design-token/*": ["libs/design-token/src/*"],
-  "@entry/hooks/*": ["libs/hooks/src/index.ts"],
-  "@entry/ui/*": ["libs/ui/src/idnex.ts"]
+  ]
 }
