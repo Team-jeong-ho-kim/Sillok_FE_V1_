@@ -105,7 +105,7 @@ export const Suggestion = () => {
           <Flex isColumn={true} gap={60}>
             <Inputs
               label="글 제목"
-              placeholder="글 제목을 입력해주세요 (30자 이내)"
+              placeholder="글 제목을 입력해주세요 (50자 이내)"
               onChange={handleTitleChange}
               value={datas.title}
             />
@@ -117,7 +117,7 @@ export const Suggestion = () => {
             />
             <Inputs
               label="설명"
-              placeholder="설명을 입력해주세요"
+              placeholder="설명을 입력해주세요 (30자 이내)"
               onChange={handleIntroductionChange}
               value={datas.introduction}
             />
