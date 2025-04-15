@@ -79,7 +79,6 @@ export const Suggestion = () => {
     if (
       datas.category === '' ||
       datas.image === null ||
-      datas.introduction === '' ||
       datas.link === '' ||
       datas.title === ''
     ) {
