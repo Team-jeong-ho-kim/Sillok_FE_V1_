@@ -25,12 +25,14 @@ export const Post = ({
   category,
   createdAt,
 }: IPostType) => {
-  const modalClick = () => {
+  const modalClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setIsShow(true);
+    e.stopPropagation();
   };
 
   const apiAccept = useApiAccept();
-  const sureClick = (id: number) => {
+  const sureClick = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     apiAccept.mutate(id);
   };
 
@@ -38,16 +40,13 @@ export const Post = ({
 
   const postApi = useApiPostDetail();
 
-  const postClick = (id: number, e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    if (!isAdmin) {
-      postApi.mutate(id);
-    }
+  const postClick = (id: number) => {
+    postApi.mutate(id);
   };
 
   return (
     <div>
-      <Container onClick={(e) => id && postClick(id, e)}>
+      <Container onClick={() => id && postClick(id)}>
         <Flex
           alignItems="flex-end"
           isColumn={true}
@@ -80,12 +79,12 @@ export const Post = ({
                 color="#402E18"
                 backgroundColor="#ffffff"
                 hoverBackgroundColor="#f9f9f9"
-                onClick={modalClick}
+                onClick={(e) => modalClick(e)}
               >
                 삭제
               </Button>
               <Button
-                onClick={() => id && sureClick(id)}
+                onClick={(e) => id && sureClick(id, e)}
                 backgroundColor="#3f72ff"
                 hoverBackgroundColor="#2958d8"
               >
@@ -114,8 +113,9 @@ const Container = styled.div`
 `;
 
 const ImgContainer = styled.img`
-  width: 100%;
+  width: 320px;
   height: 200px;
+  object-fit: cover;
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid #ece9e9;
