@@ -113,7 +113,7 @@ const Container = styled.div`
 `;
 
 const ImgContainer = styled.img`
-  width: 320px;
+  width: 100%;
   height: 200px;
   object-fit: cover;
   border-radius: 24px;
