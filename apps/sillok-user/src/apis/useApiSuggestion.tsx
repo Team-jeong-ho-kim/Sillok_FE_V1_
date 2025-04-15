@@ -42,7 +42,7 @@ export const useApiSuggestion = () => {
     },
 
     onSuccess: (data) => {
-      toast.success('글이 성공적으로 등록되었습니다!');
+      toast.success('글이 성공적으로 추천되었습니다!');
       navigate('/');
     },
 
